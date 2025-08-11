@@ -66,9 +66,8 @@ public class ItemServiceImpl implements ItemService {
         newItem.setDescription(entity.getDescription());
         newItem.setUnitPrice(entity.getUnitPrice());
         newItem.setQty(entity.getQty());
-        int id = itemDAO.create(newItem);
 
-        return id;
+        return itemDAO.create(newItem);
     }
 
     @Override

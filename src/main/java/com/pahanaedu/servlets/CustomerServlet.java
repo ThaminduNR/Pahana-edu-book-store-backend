@@ -3,11 +3,11 @@ package com.pahanaedu.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pahanaedu.dao.CustomerDAO;
+import com.pahanaedu.dto.CustomerDto;
 import com.pahanaedu.exception.NotFoundException;
 import com.pahanaedu.exception.ValidationException;
-import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.service.impl.CustomerServiceImpl;
 import com.pahanaedu.util.ResponseUtil;
 
 import javax.servlet.ServletException;
@@ -26,29 +26,27 @@ import static java.lang.Integer.parseInt;
 @WebServlet(urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
 
-    private CustomerService service;
-    private Gson gson;
 
-    CustomerDAO customerDAO = new CustomerDAO();
+    CustomerService customerService = new CustomerServiceImpl();
+    Gson gson = new GsonBuilder().serializeNulls().create();
 
-
-    @Override
-    public void init() throws ServletException {
-        service = new CustomerService(new CustomerDAO());
-        gson = new GsonBuilder().serializeNulls().create();
-    }
+//    @Override
+//    public void init() throws ServletException {
+//        service = new CustomerService1(new Customer1DAO());
+//        gson = new GsonBuilder().serializeNulls().create();
+//    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         try {
             System.out.println("CustomerServlet doGet");
-            List<Customer> customers = service.listAll();
-            if (customers.isEmpty()) {
+            List<CustomerDto> list = customerService.findAll();
+            if (list.isEmpty()) {
                 System.out.println("Customer list is empty");
             }
 
-            ResponseUtil.send(resp, "Customer list", 200, customers, true);
+            ResponseUtil.send(resp, "Customer list", 200, list, true);
         } catch (Exception e) {
             ResponseUtil.send(resp, e.getMessage(), 404, null, false);
 
@@ -58,12 +56,12 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            CustomerDto body = gson.fromJson(req.getReader(), CustomerDto.class);
             if (body == null || body.getName() == null || body.getName().isEmpty()) {
                 ResponseUtil.send(resp, "name is required", 400, null, false);
                 return;
             }
-            int id = service.create(body);
+            int id = customerService.create(body);
             Map<String, Object> data = Collections.singletonMap("id", id);
             ResponseUtil.send(resp, "Customer created", 201, data, true);
         } catch (Exception e) {
@@ -76,19 +74,19 @@ public class CustomerServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             int id = parseInt(req.getParameter("id"));
-            System.out.println("ID"+ id);
+            System.out.println("ID" + id);
             if (id <= 0) {
                 ResponseUtil.send(resp, "Invalid id", 400, null, false);
                 return;
             }
 
-            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            CustomerDto body = gson.fromJson(req.getReader(), CustomerDto.class);
             if (body == null) {
                 ResponseUtil.send(resp, "Request body is required", 400, null, false);
                 return;
             }
 
-            boolean updated = service.update(id, body );
+            boolean updated = customerService.update(body, id);
             ResponseUtil.send(resp, updated ? "Customer updated" : "Update failed",
                     updated ? 200 : 400, null, updated);
 
@@ -112,13 +110,13 @@ public class CustomerServlet extends HttpServlet {
                 ResponseUtil.send(resp, "Invalid id", 400, null, false);
                 return;
             }
-            boolean deleted = service.delete(id);
+            boolean deleted = customerService.delete(id);
             if (deleted) {
                 ResponseUtil.send(resp, "Customer deleted", 200, null, true);
             }
         } catch (Exception e) {
             if (Objects.equals(e.getMessage(), "Customer not found"))
-                ResponseUtil.send(resp, e.getMessage(), 00, null, false);
+                ResponseUtil.send(resp, e.getMessage(), 400, null, false);
             else {
                 ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
             }

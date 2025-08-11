@@ -102,4 +102,28 @@ public class CustomerServlet extends HttpServlet {
             ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(req.getParameter("id"));
+            if (id <= 0) {
+                ResponseUtil.send(resp, "Invalid id", 400, null, false);
+                return;
+            }
+
+            boolean deleted = service.delete(id);
+
+            if (deleted) {
+                ResponseUtil.send(resp, "Customer deleted", 200, null, true);
+            } else {
+                ResponseUtil.send(resp, "Customer not found", 404, null, false);
+            }
+        } catch (NumberFormatException e) {
+            ResponseUtil.send(resp, "Invalid id format", 400, null, false);
+        } catch (Exception e) {
+            ResponseUtil.send(resp, e.getMessage(), 500, null, false);
+        }
+    }
 }
+

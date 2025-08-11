@@ -1,13 +1,13 @@
 package com.pahanaedu.servlets;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pahanaedu.dao.CustomerDAO;
+import com.pahanaedu.dto.ItemDto;
 import com.pahanaedu.exception.NotFoundException;
 import com.pahanaedu.exception.ValidationException;
 import com.pahanaedu.model.Customer;
-import com.pahanaedu.service.CustomerService;
+import com.pahanaedu.service.ItemService;
+import com.pahanaedu.service.impl.ItemServiceImpl;
 import com.pahanaedu.util.ResponseUtil;
 
 import javax.servlet.ServletException;
@@ -23,32 +23,23 @@ import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
-@WebServlet(urlPatterns = "/customers")
-public class CustomerServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/items")
+public class ItemServlet extends HttpServlet {
 
-    private CustomerService service;
-    private Gson gson;
+    ItemService itemService = new ItemServiceImpl();
+    Gson gson = new GsonBuilder().serializeNulls().create();
 
-    CustomerDAO customerDAO = new CustomerDAO();
-
-
-    @Override
-    public void init() throws ServletException {
-        service = new CustomerService(new CustomerDAO());
-        gson = new GsonBuilder().serializeNulls().create();
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         try {
-            System.out.println("CustomerServlet doGet");
-            List<Customer> customers = service.listAll();
-            if (customers.isEmpty()) {
-                System.out.println("Customer list is empty");
+            System.out.println("ItemServlet doGet");
+            List<ItemDto> itemList = itemService.findAll();
+            if (itemList.isEmpty()) {
+                System.out.println("Item list is empty");
             }
 
-            ResponseUtil.send(resp, "Customer list", 200, customers, true);
+            ResponseUtil.send(resp, "Item list", 200, itemList, true);
         } catch (Exception e) {
             ResponseUtil.send(resp, e.getMessage(), 404, null, false);
 
@@ -58,14 +49,14 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            ItemDto body = gson.fromJson(req.getReader(), ItemDto.class);
             if (body == null || body.getName() == null || body.getName().isEmpty()) {
                 ResponseUtil.send(resp, "name is required", 400, null, false);
                 return;
             }
-            int id = service.create(body);
+            int id = itemService.create(body);
             Map<String, Object> data = Collections.singletonMap("id", id);
-            ResponseUtil.send(resp, "Customer created", 201, data, true);
+            ResponseUtil.send(resp, "Item created", 200, data, true);
         } catch (Exception e) {
             e.printStackTrace();
             ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
@@ -76,22 +67,21 @@ public class CustomerServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             int id = parseInt(req.getParameter("id"));
-            System.out.println("ID"+ id);
+            System.out.println("ID" + id);
             if (id <= 0) {
                 ResponseUtil.send(resp, "Invalid id", 400, null, false);
                 return;
             }
 
-            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            ItemDto body = gson.fromJson(req.getReader(), ItemDto.class);
             if (body == null) {
                 ResponseUtil.send(resp, "Request body is required", 400, null, false);
                 return;
             }
 
-            boolean updated = service.update(id, body );
-            ResponseUtil.send(resp, updated ? "Customer updated" : "Update failed",
+            boolean updated = itemService.update(body, id);
+            ResponseUtil.send(resp, updated ? "Item updated" : "Update failed",
                     updated ? 200 : 400, null, updated);
-
         } catch (NotFoundException e) {
             ResponseUtil.send(resp, e.getMessage(), 404, null, false);
 
@@ -99,10 +89,10 @@ public class CustomerServlet extends HttpServlet {
             ResponseUtil.send(resp, e.getMessage(), 400, null, false);
 
         } catch (Exception e) {
-            e.printStackTrace();
             ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
         }
     }
+
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -112,12 +102,12 @@ public class CustomerServlet extends HttpServlet {
                 ResponseUtil.send(resp, "Invalid id", 400, null, false);
                 return;
             }
-            boolean deleted = service.delete(id);
+            boolean deleted = itemService.delete(id);
             if (deleted) {
-                ResponseUtil.send(resp, "Customer deleted", 200, null, true);
+                ResponseUtil.send(resp, "Item deleted", 200, null, true);
             }
         } catch (Exception e) {
-            if (Objects.equals(e.getMessage(), "Customer not found"))
+            if (Objects.equals(e.getMessage(), "Item not found"))
                 ResponseUtil.send(resp, e.getMessage(), 00, null, false);
             else {
                 ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);

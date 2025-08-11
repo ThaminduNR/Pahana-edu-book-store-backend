@@ -4,6 +4,7 @@ package com.pahanaedu.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pahanaedu.dao.CustomerDAO;
+import com.pahanaedu.exception.NotFoundException;
 import com.pahanaedu.exception.ValidationException;
 import com.pahanaedu.model.Customer;
 import com.pahanaedu.service.CustomerService;
@@ -15,8 +16,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static java.lang.Integer.parseInt;
 
 @WebServlet(urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
@@ -43,11 +47,59 @@ public class CustomerServlet extends HttpServlet {
                 System.out.println("Customer list is empty");
             }
 
-
             ResponseUtil.send(resp, "Customer list", 200, customers, true);
-        }catch (Exception e) {
+        } catch (Exception e) {
             ResponseUtil.send(resp, e.getMessage(), 404, null, false);
 
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            if (body == null || body.getName() == null || body.getName().isEmpty()) {
+                ResponseUtil.send(resp, "name is required", 400, null, false);
+                return;
+            }
+            int id = service.create(body);
+            Map<String, Object> data = Collections.singletonMap("id", id);
+            ResponseUtil.send(resp, "Customer created", 201, data, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            int id = parseInt(req.getParameter("id"));
+            System.out.println("ID"+ id);
+            if (id <= 0) {
+                ResponseUtil.send(resp, "Invalid id", 400, null, false);
+                return;
+            }
+
+            Customer body = gson.fromJson(req.getReader(), Customer.class);
+            if (body == null) {
+                ResponseUtil.send(resp, "Request body is required", 400, null, false);
+                return;
+            }
+
+            boolean updated = service.update(id, body );
+            ResponseUtil.send(resp, updated ? "Customer updated" : "Update failed",
+                    updated ? 200 : 400, null, updated);
+
+        } catch (NotFoundException e) {
+            ResponseUtil.send(resp, e.getMessage(), 404, null, false);
+
+        } catch (IllegalArgumentException | ValidationException e) {
+            ResponseUtil.send(resp, e.getMessage(), 400, null, false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
         }
     }
 }

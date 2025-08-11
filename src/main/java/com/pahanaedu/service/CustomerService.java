@@ -23,14 +23,14 @@ public class CustomerService {
     }
     public int create(Customer c) throws Exception {
         //validateForCreate(c);
-        return dao.post(c);
+        return dao.create(c);
     }
 
     public boolean update(int id, Customer update) throws Exception {
         Customer existing = dao.findById(id);
         if (existing == null) throw new NotFoundException("Customer not found");
 
-        // apply partial updates (null = keep old)
+
         if (update.getName()    != null) existing.setName(update.getName());
         if (update.getAddress() != null) existing.setAddress(update.getAddress());
         if (update.getPhone()   != null) existing.setPhone(update.getPhone());

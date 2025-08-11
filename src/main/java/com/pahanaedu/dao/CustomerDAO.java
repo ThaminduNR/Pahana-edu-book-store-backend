@@ -31,7 +31,7 @@ public class CustomerDAO {
         }
     }
 
-    public int post(Customer c) throws Exception {
+    public int create(Customer c) throws Exception {
         String sql = "INSERT INTO customers (name,address,phone,email) VALUES (?,?,?,?)";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -79,9 +79,4 @@ public class CustomerDAO {
                 rs.getString("email")
         );
     }
-    private static final String URL  = "jdbc:mysql://127.0.0.1:3306/pahana_edu?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Colombo";
-    private static final String USER = "root";
-    private static final String PASS = "1234";
-
-
 }

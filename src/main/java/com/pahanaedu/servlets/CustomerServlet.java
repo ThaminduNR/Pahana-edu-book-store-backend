@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
@@ -111,18 +112,16 @@ public class CustomerServlet extends HttpServlet {
                 ResponseUtil.send(resp, "Invalid id", 400, null, false);
                 return;
             }
-
             boolean deleted = service.delete(id);
-
             if (deleted) {
                 ResponseUtil.send(resp, "Customer deleted", 200, null, true);
-            } else {
-                ResponseUtil.send(resp, "Customer not found", 404, null, false);
             }
-        } catch (NumberFormatException e) {
-            ResponseUtil.send(resp, "Invalid id format", 400, null, false);
         } catch (Exception e) {
-            ResponseUtil.send(resp, e.getMessage(), 500, null, false);
+            if (Objects.equals(e.getMessage(), "Customer not found"))
+                ResponseUtil.send(resp, e.getMessage(), 400, null, false);
+            else {
+                ResponseUtil.send(resp, "Server error: " + e.getMessage(), 500, null, false);
+            }
         }
     }
 }

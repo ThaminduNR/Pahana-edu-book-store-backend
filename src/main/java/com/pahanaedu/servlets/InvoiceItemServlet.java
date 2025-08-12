@@ -25,7 +25,7 @@ import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
-@WebServlet(urlPatterns = "/invoiceIem")
+@WebServlet(urlPatterns = "/invoiceItem")
 public class InvoiceItemServlet extends HttpServlet {
 
     InvoiceItemService invoiceItemService = new InvoiceItemServiceImpl();

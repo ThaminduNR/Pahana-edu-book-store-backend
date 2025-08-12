@@ -134,6 +134,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public boolean delete(Integer id) throws Exception {
         if (id <= 0) throw new IllegalArgumentException("Invalid invoice id");
+        Invoice byId = invoiceDAO.findById(id);
+        if (byId == null) throw new NotFoundException("Invoice not found");
         return invoiceDAO.delete(id);
     }
 

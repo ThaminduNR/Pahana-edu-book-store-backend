@@ -53,8 +53,8 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
 
         if (dto.getInvoiceId() != null) existing.setInvoiceId(dto.getInvoiceId());
-        if (dto.getItemId()    != null) existing.setItemId(dto.getItemId());
-        if (dto.getQuantity()  != null) existing.setQuantity(dto.getQuantity());
+        if (dto.getItemId() != null) existing.setItemId(dto.getItemId());
+        if (dto.getQuantity() != null) existing.setQuantity(dto.getQuantity());
         if (dto.getUnitPrice() != null) existing.setUnitPrice(dto.getUnitPrice());
 
         //validateUpdate(existing);
@@ -68,6 +68,23 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
         if (byId == null) throw new NotFoundException("Id not found");
         return invItm.delete(id);
     }
+
+
+    @Override
+    public List<InvoiceItemDto> findByInvoiceId(Integer invoiceId) throws Exception {
+        if (invoiceId == null || invoiceId <= 0) throw new ValidationException("Invalid Invoice id");
+        List<InvoiceItem> byInvoiceId = invItm.findByInvoiceId(invoiceId);
+
+        if (byInvoiceId == null || byInvoiceId.isEmpty()) throw new NotFoundException("Invoice not found");
+
+        return null;
+    }
+
+    @Override
+    public boolean deleteByInvoiceId(Integer invoiceId) throws Exception {
+        return false;
+    }
+
 
     private InvoiceItemDto toDto(InvoiceItem m) {
         InvoiceItemDto d = new InvoiceItemDto();
@@ -84,8 +101,8 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
         if (d.getId() != null) m.setId(d.getId());
         if (d.getInvoiceId() != null) m.setInvoiceId(d.getInvoiceId());
-        if (d.getItemId() != null)    m.setItemId(d.getItemId());
-        if (d.getQuantity() != null)  m.setQuantity(d.getQuantity());
+        if (d.getItemId() != null) m.setItemId(d.getItemId());
+        if (d.getQuantity() != null) m.setQuantity(d.getQuantity());
         if (d.getUnitPrice() != null) m.setUnitPrice(d.getUnitPrice());
         return m;
     }

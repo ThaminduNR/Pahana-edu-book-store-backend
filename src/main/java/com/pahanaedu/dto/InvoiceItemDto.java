@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 
 public class InvoiceItemDto {
 
-    private int id;
-    private int invoiceId;
-    private int itemId;
-    private int quantity;
+    private Integer id;
+    private Integer invoiceId;
+    private Integer itemId;
+    private Integer quantity;
     private BigDecimal unitPrice;
 
     public InvoiceItemDto() {
@@ -21,7 +21,7 @@ public class InvoiceItemDto {
         this.unitPrice = unitPrice;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -29,7 +29,7 @@ public class InvoiceItemDto {
         this.id = id;
     }
 
-    public int getInvoiceId() {
+    public Integer getInvoiceId() {
         return invoiceId;
     }
 
@@ -37,7 +37,7 @@ public class InvoiceItemDto {
         this.invoiceId = invoiceId;
     }
 
-    public int getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
@@ -45,7 +45,7 @@ public class InvoiceItemDto {
         this.itemId = itemId;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 

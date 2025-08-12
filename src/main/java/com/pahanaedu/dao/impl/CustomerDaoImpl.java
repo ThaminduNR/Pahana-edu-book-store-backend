@@ -48,6 +48,7 @@ public class CustomerDaoImpl implements CustomerDAO {
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 return keys.next() ? keys.getInt(1) : 0;
             }
+
         }
     }
 
@@ -61,6 +62,7 @@ public class CustomerDaoImpl implements CustomerDAO {
             ps.setString(3, cus.getPhone());
             ps.setString(4, cus.getEmail());
             ps.setInt(5, cus.getId());
+
             return ps.executeUpdate() > 0;
         }
     }

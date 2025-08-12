@@ -2,12 +2,13 @@ package com.pahanaedu.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class InvoiceDto {
     private int id;
     private String invoiceNo;
     private int customerId;
-    private LocalDateTime invoiceDate;
+    private String invoiceDate;
     private BigDecimal subtotal = BigDecimal.ZERO;
     private BigDecimal taxAmount = BigDecimal.ZERO;
     private BigDecimal discountAmt = BigDecimal.ZERO;
@@ -18,7 +19,7 @@ public class InvoiceDto {
     public InvoiceDto() {
     }
 
-    public InvoiceDto(int id, String invoiceNo, int customerId, LocalDateTime invoiceDate, BigDecimal subtotal, BigDecimal taxAmount, BigDecimal discountAmt, BigDecimal totalAmount, String status, Integer createdBy) {
+    public InvoiceDto(int id, String invoiceNo, int customerId, String invoiceDate, BigDecimal subtotal, BigDecimal taxAmount, BigDecimal discountAmt, BigDecimal totalAmount, String status, Integer createdBy) {
         this.id = id;
         this.invoiceNo = invoiceNo;
         this.customerId = customerId;
@@ -55,11 +56,11 @@ public class InvoiceDto {
         this.customerId = customerId;
     }
 
-    public LocalDateTime getInvoiceDate() {
+    public String getInvoiceDate() {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(LocalDateTime invoiceDate) {
+    public void setInvoiceDate(String invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 
@@ -110,4 +111,6 @@ public class InvoiceDto {
     public void setCreatedBy(Integer createdBy) {
         this.createdBy = createdBy;
     }
+
+
 }

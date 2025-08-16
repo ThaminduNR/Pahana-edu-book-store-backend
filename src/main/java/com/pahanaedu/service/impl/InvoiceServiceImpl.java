@@ -5,10 +5,13 @@ import com.pahanaedu.dao.impl.InvoiceDaoImpl;
 import com.pahanaedu.dto.InvoiceDto;
 import com.pahanaedu.exception.NotFoundException;
 import com.pahanaedu.model.Invoice;
+import com.pahanaedu.model.InvoiceItem;
 import com.pahanaedu.service.InvoiceService;
 import com.pahanaedu.util.DateConverter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +21,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     InvoiceDAO invoiceDAO = new InvoiceDaoImpl();
     DateConverter dc = new DateConverter();
+
+    InvoiceDaoImpl daoimpl = new InvoiceDaoImpl();
 
 
     @Override
@@ -147,4 +152,88 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
+    //generate Invoice ID
+    public String generateNextInvoiceNo(LocalDate date) throws Exception {
+        if (!(invoiceDAO instanceof InvoiceDaoImpl)) {
+            throw new IllegalStateException("InvoiceDAO does not support generateNextInvoiceNo");
+        }
+        InvoiceDaoImpl impl = (InvoiceDaoImpl) invoiceDAO;
+        return impl.generateNextInvoiceNo(date != null ? date : LocalDate.now());
+    }
+
+    public int createWithItems(InvoiceDto headerDto,
+                               List<InvoiceItem> lines,
+                               BigDecimal taxRate) throws Exception {
+        if (lines == null || lines.isEmpty()) {
+            throw new IllegalArgumentException("Invoice requires at least one line item");
+        }
+        if (!(invoiceDAO instanceof InvoiceDaoImpl)) {
+            throw new IllegalStateException("InvoiceDAO does not support createInvoiceWithItems");
+        }
+
+        // Prepare header model
+        Invoice inv = new Invoice();
+        inv.setInvoiceNo(headerDto.getInvoiceNo());
+        inv.setCustomerId(headerDto.getCustomerId());
+        inv.setInvoiceDate(headerDto.getInvoiceDate() != null
+                ? dc.toLdt(headerDto.getInvoiceDate())
+                : LocalDateTime.now());
+        inv.setDiscountAmt(headerDto.getDiscountAmt() == null ? BigDecimal.ZERO : headerDto.getDiscountAmt());
+        inv.setStatus(headerDto.getStatus() == null || headerDto.getStatus().isEmpty() ? "ISSUED" : headerDto.getStatus());
+        inv.setCreatedBy(headerDto.getCreatedBy());
+
+        // Optionally pre-compute totals to reflect back to caller (DAO also recomputes defensively)
+        Totals t = computeTotals(lines, inv.getDiscountAmt(), taxRate);
+        inv.setSubtotal(t.subtotal);
+        inv.setTaxAmount(t.tax);
+        inv.setTotalAmount(t.total);
+
+        int newId = daoimpl.createInvoiceWithItems(inv, lines, taxRate == null ? BigDecimal.ZERO : taxRate);
+
+        // mirror values back to DTO for convenience (not required)
+        headerDto.setId(newId);
+        headerDto.setInvoiceNo(inv.getInvoiceNo());
+        headerDto.setInvoiceDate(dc.toStringLdt(inv.getInvoiceDate()));
+        headerDto.setSubtotal(inv.getSubtotal());
+        headerDto.setTaxAmount(inv.getTaxAmount());
+        headerDto.setDiscountAmt(inv.getDiscountAmt());
+        headerDto.setTotalAmount(inv.getTotalAmount());
+        headerDto.setStatus(inv.getStatus());
+
+        return newId;
+    }
+
+    // ---------- helpers (internal) ----------
+
+    private static class Totals {
+        BigDecimal subtotal;
+        BigDecimal tax;
+        BigDecimal total;
+    }
+
+    /**
+     * Compute totals from line items, discount and tax rate (scale=2, HALF_UP)
+     */
+    private Totals computeTotals(List<InvoiceItem> lines, BigDecimal discountAmt, BigDecimal taxRate) {
+        Totals out = new Totals();
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (InvoiceItem li : lines) {
+            BigDecimal line = li.getUnitPrice().multiply(BigDecimal.valueOf(li.getQuantity()));
+            subtotal = subtotal.add(line);
+        }
+        BigDecimal discount = discountAmt == null ? BigDecimal.ZERO : discountAmt;
+        BigDecimal taxable = subtotal.subtract(discount);
+        if (taxable.signum() < 0) taxable = BigDecimal.ZERO;
+        BigDecimal rate = taxRate == null ? BigDecimal.ZERO : taxRate;
+        BigDecimal tax = taxable.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = taxable.add(tax);
+
+        out.subtotal = subtotal;
+        out.tax = tax;
+        out.total = total;
+        return out;
+    }
 }
+
+
+

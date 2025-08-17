@@ -25,9 +25,6 @@ function renderTable() {
             <td>${c.address ?? ''}</td>
             <td>${c.phone ?? ''}</td>
             <td>${c.email ?? ''}</td>
-            <td>
-              <button class='btn btn-sm btn-danger' onclick='deleteCustomer(${i});event.stopPropagation();'>Delete</button>
-            </td>
           </tr>
         `).join('');
     // Add row click event to set data to form
@@ -42,8 +39,9 @@ function renderTable() {
             document.getElementById('customerAddress').value = c.address ?? '';
             document.getElementById('customerPhone').value = c.phone ?? '';
             document.getElementById('customerEmail').value = c.email ?? '';
-            // Optionally, enable update button if you want
+            // Enable update and delete buttons if a customer is selected
             document.getElementById('updateBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = false;
         });
     });
 }
@@ -124,3 +122,42 @@ async function updateCustomer() {
 document.getElementById('updateBtn').addEventListener('click', async function() {
     await updateCustomer();
 });
+// Delete customer by id
+async function deleteCustomer(id) {
+    if (!id) {
+        alert('No customer selected for delete.');
+        return;
+    }
+    // Find customer for confirmation
+    const customer = customers.find(c => c.id == id);
+    if (!customer) {
+        alert('Customer not found.');
+        return;
+    }
+    if (!confirm(`Are you sure you want to delete customer ${customer.name}?`)) return;
+    try {
+        const res = await fetch(`${BASE_URL}/customers?id=${id}`, {
+            method: 'DELETE',
+        });
+        if (!res.ok) throw new Error('Failed to delete customer');
+        await getAllCustomers();
+        document.getElementById('customerForm').reset();
+        document.getElementById('updateBtn').disabled = true;
+        document.getElementById('deleteBtn').disabled = true;
+    } catch (err) {
+        alert('Error deleting customer: ' + err.message);
+        console.error(err);
+    }
+}
+document.getElementById('deleteBtn').addEventListener('click', async function() {
+    const id = document.getElementById('customerId').value.trim();
+    await deleteCustomer(id);
+});
+// Clear form and disable buttons
+function clearCustomerForm() {
+    document.getElementById('customerForm').reset();
+    document.getElementById('updateBtn').disabled = true;
+    document.getElementById('deleteBtn').disabled = true;
+}
+
+document.getElementById('clearBtn').addEventListener('click', clearCustomerForm);

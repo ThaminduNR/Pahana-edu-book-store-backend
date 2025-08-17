@@ -1,7 +1,7 @@
 let customers = [];
 const BASE_URL = "http://localhost:8080/pahanaedu"
 
-async function getAllCustomers() {
+const getAllCustomers = async () => {
     try {
         const res = await fetch(`${BASE_URL}/customers`);
         if (!res.ok) throw new Error('Network response was not ok');
@@ -9,6 +9,7 @@ async function getAllCustomers() {
         customers = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
         renderTable();
         console.log("Customers", customers);
+
     } catch (err) {
         console.error('Failed to fetch customers:', err);
     }
@@ -16,7 +17,7 @@ async function getAllCustomers() {
 
 getAllCustomers();
 
-function renderTable() {
+const renderTable = () => {
     const tableBody = document.getElementById("customerTableBody");
     tableBody.innerHTML = customers.map((c, i) => `
           <tr data-index="${i}">
@@ -27,10 +28,10 @@ function renderTable() {
             <td>${c.email ?? ''}</td>
           </tr>
         `).join('');
-    // Add row click event to set data to form
+
     Array.from(tableBody.querySelectorAll('tr')).forEach(row => {
         row.addEventListener('click', function (e) {
-            // Ignore clicks on the delete button
+
             if (e.target.tagName === 'BUTTON') return;
             const idx = this.getAttribute('data-index');
             const c = customers[idx];
@@ -39,7 +40,6 @@ function renderTable() {
             document.getElementById('customerAddress').value = c.address ?? '';
             document.getElementById('customerPhone').value = c.phone ?? '';
             document.getElementById('customerEmail').value = c.email ?? '';
-            // Enable update and delete buttons if a customer is selected
             document.getElementById('updateBtn').disabled = false;
             document.getElementById('deleteBtn').disabled = false;
         });
@@ -51,7 +51,7 @@ function renderTable() {
 renderTable()
 
 //Create customer
-async function postCustomer(customer) {
+const postCustomer = async (customer) => {
     try {
         const res = await fetch(`${BASE_URL}/customers`, {
             method: 'POST',
@@ -74,7 +74,7 @@ async function postCustomer(customer) {
     }
 }
 
-document.getElementById('customerForm').addEventListener('submit', async function(e) {
+document.getElementById('customerForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     const customer = {
         // id is not sent for new customer (readonly)
@@ -87,7 +87,7 @@ document.getElementById('customerForm').addEventListener('submit', async functio
 });
 
 //update Customer
-async function updateCustomer() {
+const updateCustomer = async () => {
     const id = document.getElementById('customerId').value.trim();
     if (!id) {
         alert('No customer selected for update.');
@@ -119,11 +119,12 @@ async function updateCustomer() {
     }
 }
 
-document.getElementById('updateBtn').addEventListener('click', async function() {
+document.getElementById('updateBtn').addEventListener('click', async function () {
     await updateCustomer();
 });
+
 // Delete customer by id
-async function deleteCustomer(id) {
+const deleteCustomer = async (id) => {
     if (!id) {
         alert('No customer selected for delete.');
         return;
@@ -149,10 +150,12 @@ async function deleteCustomer(id) {
         console.error(err);
     }
 }
-document.getElementById('deleteBtn').addEventListener('click', async function() {
+
+document.getElementById('deleteBtn').addEventListener('click', async function () {
     const id = document.getElementById('customerId').value.trim();
     await deleteCustomer(id);
 });
+
 // Clear form and disable buttons
 function clearCustomerForm() {
     document.getElementById('customerForm').reset();
@@ -161,3 +164,4 @@ function clearCustomerForm() {
 }
 
 document.getElementById('clearBtn').addEventListener('click', clearCustomerForm);
+

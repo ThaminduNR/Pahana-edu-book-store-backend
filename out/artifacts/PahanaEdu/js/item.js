@@ -54,19 +54,22 @@ async function postItem(item) {
             },
             body: JSON.stringify(item)
         });
-        if (!res.ok) throw new Error('Network response was not ok');
         const data = await res.json();
-        console.log("Item created successfully:", data);
+        if (!res.ok) {
+            alert(data.message || 'Failed to create item');
+            return;
+        }
         getAllItems();
     } catch (err) {
-        console.error('Failed to create item:', err);
+        console.error('Failed to create item:', err.message);
+        alert('Failed to create item: ' + err.message);
     }
 }
 
 
 async function updateItem(item) {
     try {
-        const res = await fetch(`${BASE_URL}/items/${item.id}`, {
+        const res = await fetch(`${BASE_URL}/items?id=${item.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -79,13 +82,14 @@ async function updateItem(item) {
         getAllItems();
     } catch (err) {
         console.error('Failed to update item:', err);
+        alert('Failed to update item: ' + err.message);
     }
 }
 
 
 async function deleteItem(itemId) {
     try {
-        const res = await fetch(`${BASE_URL}/items/${itemId}`, {
+        const res = await fetch(`${BASE_URL}/items?id=${itemId}`, {
             method: 'DELETE'
         });
         if (!res.ok) throw new Error('Network response was not ok');
@@ -122,6 +126,8 @@ document.getElementById('updateBtn').addEventListener('click', function() {
         unitPrice: parseFloat(document.getElementById('itemUnitPrice').value),
         qty: parseInt(document.getElementById('itemQuantity').value)
     };
+
+    console.log("Updating item:", item);
     updateItem(item);
 });
 document.getElementById('deleteBtn').addEventListener('click', function() {

@@ -18,7 +18,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto findByCode(String code) throws Exception {
-        return null;
+        Item byCode = itemDAO.findByCode(code);
+        if (byCode == null) return null;
+        ItemDto dto = new ItemDto();
+        dto.setId(byCode.getId());
+        dto.setCode(byCode.getCode());
+        dto.setName(byCode.getName());
+        dto.setDescription(byCode.getDescription());
+        dto.setUnitPrice(byCode.getUnitPrice());
+        dto.setQty(byCode.getQty());
+        return dto;
+
     }
 
     @Override

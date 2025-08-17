@@ -73,6 +73,7 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            System.out.println("CustomerServlet doPut");
             int id = parseInt(req.getParameter("id"));
             System.out.println("ID" + id);
             if (id <= 0) {

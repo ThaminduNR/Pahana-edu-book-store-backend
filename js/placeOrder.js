@@ -66,6 +66,24 @@ const loadItemDropdown = () => {
   itemNameSelect.innerHTML = allItems.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
 };
 
+function calculateTotalAmount() {
+  return items.reduce((sum, item) => sum + (item.unitPrice * item.qty), 0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.getElementById('addToCartBtn').addEventListener('click', function () {
   
   const itemId = document.getElementById('itemName').value;
@@ -110,6 +128,8 @@ function renderCartTable() {
     </tr>
   `).join('');
 
+  document.getElementById('totalAmt').textContent = calculateTotalAmount().toFixed(2);
+
 }
 
 window.removeCartItem = function(idx) {
@@ -128,18 +148,20 @@ function getDiscountAmount() {
   console.log("Discount Amount", discountAmt);
 }
 
-// Place Order button event
+// Place Order button 
 document.getElementById('placeOrderBtn').addEventListener('click', async function () {
-  // Get customerId
+  if (items.length === 0) {
+    alert('Please add at least one item to the cart before placing the order.');
+    return;
+  }
   const customerId = parseInt(document.getElementById('customerId').value);
   getDiscountAmount();
-  // Prepare items for payload
   const payloadItems = items.map(i => ({
     itemId: i.id,
     quantity: i.qty,
     unitPrice: i.unitPrice
   }));
-  // Build payload
+
   const payload = {
     invoice: {
       customerId: customerId,
@@ -163,7 +185,6 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
     if (!res.ok) throw new Error('Failed to place order');
     const data = await res.json();
     alert('Order placed successfully!');
-    // Optionally, clear cart and form
     items = [];
     renderCartTable();
     document.getElementById('discountAmt').value = '';

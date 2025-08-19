@@ -1,32 +1,51 @@
+# Pahana-Edu Book Store – Frontend
 
-# Pahana-Edu Book Store – Backend (Java EE)
-Java EE (Servlets) backend for a book store / invoicing system. Uses MySQL, JDBC (Tomcat JDBC Pool), DAO/Service pattern, and JSON via Gson.
+Frontend for the Pahana-Edu Book Store and Invoicing System.
 
-# 🔍 Overview
-Framework: Java EE (Servlet API) on Tomcat 8.5+
+## 📦 Features
 
-Language/Version: Java 8+
+- Dashboard with summary cards (Customers, Items, Sales, Orders, Revenue)
+- Customer management (CRUD)
+- Item management (CRUD)
+- Place Order (create invoice, add items, discounts)
+- Bill/Invoice print and list
+- Responsive UI with Bootstrap 5
 
-DB: MySQL 5.7/8.0
+## � Getting Started
 
-JSON: Gson
+1. Clone this repo and open the `frontend` folder in VS Code or your editor.
+2. Open `index.html` or `login.html` in your browser to start.
+3. Make sure the backend (Java EE, Tomcat, MySQL) is running and accessible at the configured BASE_URL in JS files.
 
-Connection Pool: Tomcat JDBC Pool (programmatic) or JNDI
+## 🛠️ Project Structure
 
-# ✨ Features
-CRUD for Customers and Items
+- `index.html` – Login page
+- `dashboard.html` – Main dashboard with navigation
+- `home.html` – Dashboard cards (stats)
+- `customer.html` – Customer CRUD
+- `item.html` – Item CRUD
+- `placeOrder.html` – Place order/invoice
+- `billPrint.html` – Invoice list and print
+- `js/` – All frontend JavaScript logic
+- `css/` – (Optional) Custom styles
+- `assets/` – Images and static assets
 
-Invoices + Invoice Items with totals
+## 🌐 Tech Stack
 
-Consistent JSON response envelope
+- HTML5, CSS3, Bootstrap 5
+- Vanilla JavaScript (ES6+)
+- Backend: Java EE (Servlets), MySQL, Tomcat, Gson (see backend repo)
 
-Transaction-aware DAO overloads (optional)
+## ⚡ Quick Links
 
-# 🧱 Tech Stack
-Server: Apache Tomcat 8.5+
+- [Backend Repo](../backend) (Java EE, MySQL)
+- [Bootstrap Docs](https://getbootstrap.com/)
 
-Database: MySQL (InnoDB, FK constraints)
+## 📝 Notes
 
-Libraries: Gson, Tomcat JDBC Pool
+- Update `BASE_URL` in JS files if your backend runs on a different host/port.
+- All API calls expect JSON responses from the backend.
 
-Testing: cURL / Postman
+---
+
+© 2025 Pahana-Edu Book Store

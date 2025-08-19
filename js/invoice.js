@@ -13,24 +13,32 @@ const total = 0;
 // Do not set .value on a <p> element. Use .textContent and set after data is loaded.
 
 
-getLastInvoiceID();
+// getLastInvoiceID();
 
-async function getLastInvoiceID() {
-    try {
-    const res = await fetch(`${BASE_URL}/util`);
-    if (!res.ok) throw new Error('Failed to fetch last invoice ID');
-    const data = await res.json();
-    const lastInvoiceId = data.id || data.lastId || data;
-    invoiceID = lastInvoiceId.data;
-    console.log('Last Invoice ID:', lastInvoiceId);
-        if (lastInvoiceId.success == true) {
-            getBillDetail(invoiceID);
-        }
+// async function getLastInvoiceID() {
+//     try {
+//     const res = await fetch(`${BASE_URL}/util`);
+//     if (!res.ok) throw new Error('Failed to fetch last invoice ID');
+//     const data = await res.json();
+//     const lastInvoiceId = data.id || data.lastId || data;
+//     invoiceID = lastInvoiceId.data;
+//     console.log('Last Invoice ID:', lastInvoiceId);
+//         if (lastInvoiceId.success == true) {
+//             getBillDetail(invoiceID);
+//         }
         
-  } catch (err) {
-    console.error('Error fetching last invoice ID:', err);
-    return null;
-  }
+//   } catch (err) {
+//     console.error('Error fetching last invoice ID:', err);
+//     return null;
+//   }
+// }
+
+const urlParams = new URLSearchParams(window.location.search);
+const invoiceId = urlParams.get('invoiceId');
+console.log("InvoiceID", invoiceId);
+
+if (invoiceId) {
+  getBillDetail(invoiceId);
 }
 
 

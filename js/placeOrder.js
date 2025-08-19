@@ -78,17 +78,6 @@ function calculateTotalAmount() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 document.getElementById('addToCartBtn').addEventListener('click', function () {
   
   const itemId = document.getElementById('itemName').value;
@@ -119,7 +108,6 @@ document.getElementById('addToCartBtn').addEventListener('click', function () {
 });
 
 function renderCartTable() {
-  //console.log("Cart items", items);
   const qty = parseInt(document.getElementById('itemQty').value);
 
   const tbody = document.getElementById('cartTableBody');
@@ -199,9 +187,6 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
   }
 });
 
-document.getElementById('printBillBtn').addEventListener('click', function () {
-  //getLastInvoiceID()
-  window.open('invoice.html', '_blank');
-});
+
 
 

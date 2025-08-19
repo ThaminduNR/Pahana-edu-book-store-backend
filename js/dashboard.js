@@ -5,7 +5,7 @@ const pages = {
     page2: `<iframe src="./customer.html" style="width:100%;height:95vh;border:none;background:#fff;"></iframe>`,
     page3: `<iframe src="./item.html" style="width:100%;height:98vh;border:none;background:#fff;"></iframe>`,
     page4: `<iframe src="./placeOrder.html" style="width:100%;height:98vh;border:none;background:#fff;"></iframe>`,
-    page5: `<h2>Support</h2><p>Contact support here.</p>`
+    page5: `<iframe src="./billPrint.html" style="width:100%;height:98vh;border:none;background:#fff;"></iframe>`
 };
 const sidebarNav = document.getElementById('sidebarNav');
 const mainContent = document.getElementById('mainContent');

@@ -57,13 +57,14 @@ async function postItem(item) {
         });
         const data = await res.json();
         if (!res.ok) {
-            alert(data.message || 'Failed to create item');
+            swal(data.message || 'Failed to create item');
             return;
         }
+        swal("Book Added Succesfully")
         getAllItems();
     } catch (err) {
         console.error('Failed to create item:', err.message);
-        alert('Failed to create item: ' + err.message);
+        swal('Failed to create item: ' + err.message);
     }
 }
 
@@ -80,24 +81,37 @@ async function updateItem(item) {
         if (!res.ok) throw new Error('Network response was not ok');
         const data = await res.json();
         console.log("Item updated successfully:", data);
+        swal("Book Update Succesfully")
         getAllItems();
     } catch (err) {
         console.error('Failed to update item:', err);
-        alert('Failed to update item: ' + err.message);
+        swal('Failed to update item: ' + err.message);
     }
 }
 
 
 async function deleteItem(itemId) {
+    
+    const willDelete = await new Promise(resolve => {
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to delete this item?",
+            icon: "warning",
+            buttons: ["Cancel", "Delete"],
+            dangerMode: true,
+        }).then(willDelete => resolve(willDelete));
+    });
+    if (!willDelete) return;
     try {
         const res = await fetch(`${BASE_URL}/items?id=${itemId}`, {
             method: 'DELETE'
         });
         if (!res.ok) throw new Error('Network response was not ok');
-        console.log("Item deleted successfully");
+        swal("Book Delete Succesfully");
         getAllItems();
     } catch (err) {
         console.error('Failed to delete item:', err);
+        swal('Failed to delete item: ' + err.message);
     }
 }
 
@@ -116,7 +130,7 @@ document.getElementById('itemForm').addEventListener('submit', function(e) {
 document.getElementById('updateBtn').addEventListener('click', function() {
     const itemId = document.getElementById('itemId').value.trim();
     if (!itemId) {
-        alert('No item selected for update.');
+        swal('No item selected for update.');
         return;
     }
     const item = {
@@ -134,7 +148,7 @@ document.getElementById('updateBtn').addEventListener('click', function() {
 document.getElementById('deleteBtn').addEventListener('click', function() {
     const itemId = document.getElementById('itemId').value.trim();
     if (!itemId) {
-        alert('No item selected for delete.');
+        swal('No item selected for delete.');
         return;
     }
     deleteItem(itemId);

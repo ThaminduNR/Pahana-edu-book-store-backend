@@ -15,16 +15,14 @@
       rel="stylesheet"
     />
     <style>
-      .order-title {
+      .item-title {
         background: linear-gradient(90deg, #007bff 0%, #6a11cb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         font-weight: 700;
         font-size: 2.2rem;
         margin-bottom: 2rem;
-        color: #fff;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        display: inline-block;
       }
     </style>
   </head>
@@ -107,7 +105,7 @@
       </div>
     </nav>
     <div class="container py-4">
-      <h2 class="mb-4 order-title mt-5">Place Order</h2>
+      <div class="item-title text-left mt-5">Place Order</div>
       <div class="row mb-3">
         <div class="col-md-4">
           <label for="customerId" class="form-label w-100">Customer ID</label>

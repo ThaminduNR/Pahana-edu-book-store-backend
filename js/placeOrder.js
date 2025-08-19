@@ -4,6 +4,7 @@ const status = "ISSUED"
 const createdBy = 1;
 const taxRate = 0;
 let discountAmt = 0
+document.getElementById('itemQty').value = 0;
 
 const getAllCustomers = async () => {
   try {
@@ -120,9 +121,54 @@ window.removeCartItem = function(idx) {
 
 getAllItems().then(loadItemDropdown);
 
+
 function getDiscountAmount() {
   const discountInput = document.getElementById('discountAmt');
-  discountAmt = discountInput.value || 0;
-
+  discountAmt = parseFloat(discountInput.value) || 0;
   console.log("Discount Amount", discountAmt);
 }
+
+// Place Order button event
+document.getElementById('placeOrderBtn').addEventListener('click', async function () {
+  // Get customerId
+  const customerId = parseInt(document.getElementById('customerId').value);
+  getDiscountAmount();
+  // Prepare items for payload
+  const payloadItems = items.map(i => ({
+    itemId: i.id,
+    quantity: i.qty,
+    unitPrice: i.unitPrice
+  }));
+  // Build payload
+  const payload = {
+    invoice: {
+      customerId: customerId,
+      discountAmt: discountAmt,
+      status: status,
+      createdBy: createdBy
+    },
+    taxRate: taxRate,
+    items: payloadItems
+  };
+
+  console.log("Payload", payload);
+  try {
+    const res = await fetch(`${BASE_URL}/invoices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to place order');
+    const data = await res.json();
+    alert('Order placed successfully!');
+    // Optionally, clear cart and form
+    items = [];
+    renderCartTable();
+    document.getElementById('discountAmt').value = '';
+    document.getElementById('itemQty').value = 0;
+  } catch (err) {
+    alert('Error placing order: ' + err.message);
+  }
+});

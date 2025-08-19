@@ -1,7 +1,7 @@
 console.log("Dashboard")
 
 const pages = {
-    page1: `<h2>Home</h2><p>This is the home page content.</p>`,
+    page1: `<iframe src="./home.html" style="width:100%;height:95vh;border:none;background:#fff;"></iframe>`,
     page2: `<iframe src="./customer.html" style="width:100%;height:95vh;border:none;background:#fff;"></iframe>`,
     page3: `<iframe src="./item.html" style="width:100%;height:98vh;border:none;background:#fff;"></iframe>`,
     page4: `<iframe src="./placeOrder.html" style="width:100%;height:98vh;border:none;background:#fff;"></iframe>`,

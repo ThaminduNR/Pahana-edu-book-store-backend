@@ -1,94 +1,201 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Place Order</title>
-   
-    <link rel="stylesheet" type="text/css" href="dist/sweetalert.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="dist/sweetalert.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        .order-title {
-            background: linear-gradient(90deg, #007bff 0%, #6a11cb 100%);
-            font-weight: 700;
-            font-size: 2.2rem;
-            margin-bottom: 2rem;
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: inline-block;
-        }
+      .order-title {
+        background: linear-gradient(90deg, #007bff 0%, #6a11cb 100%);
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: inline-block;
+      }
     </style>
-</head>
-<body>
-<div class="container py-4">
-    <h2 class="mb-4 order-title">Place Order</h2>
-    <div class="row mb-3">
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasDarkNavbar"
+          aria-controls="offcanvasDarkNavbar"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Pahana Education</a>
+        <div
+          class="offcanvas offcanvas-start text-bg-dark"
+          tabindex="-1"
+          id="offcanvasDarkNavbar"
+          aria-labelledby="offcanvasDarkNavbarLabel"
+        >
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">
+              Pahana Education
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="./home.html"
+                  >Home</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="./customer.html"
+                  >Customers</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="./item.html"
+                  >Books</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="./placeOrder.html"
+                  >Place Order</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="./billPrint.html"
+                  >Print Bill</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="container py-4">
+      <h2 class="mb-4 order-title mt-5">Place Order</h2>
+      <div class="row mb-3">
         <div class="col-md-4">
-            <label for="customerId" class="form-label w-100">Customer ID</label>
-            <select id="customerId" class="form-select"></select>
+          <label for="customerId" class="form-label w-100">Customer ID</label>
+          <select id="customerId" class="form-select"></select>
         </div>
         <div class="col-md-4">
-            <label for="customerName" class="form-label">Customer Name</label>
-            <input type="text" id="customerName" class="form-control" placeholder="Name" disabled>
+          <label for="customerName" class="form-label">Customer Name</label>
+          <input
+            type="text"
+            id="customerName"
+            class="form-control"
+            placeholder="Name"
+            disabled
+          />
         </div>
         <div class="col-md-4">
-            <label for="discountAmt" class="form-label">Discount Amount</label>
-            <input type="text" id="discountAmt" class="form-control" placeholder="Discount">
+          <label for="discountAmt" class="form-label">Discount Amount</label>
+          <input
+            type="text"
+            id="discountAmt"
+            class="form-control"
+            placeholder="Discount"
+          />
         </div>
         <div class="col-md-4"></div>
-    </div>
-    <div class="row mb-5">
+      </div>
+      <div class="row mb-5">
         <div class="col-md-4">
-            <label for="itemName" class="form-label">Add Item</label>
-            <select id="itemName" class="form-select"></select>
+          <label for="itemName" class="form-label">Add Item</label>
+          <select id="itemName" class="form-select"></select>
         </div>
         <div class="col-md-2">
-            <label for="itemQty" class="form-label">Quantity</label>
-            <input type="number" id="itemQty" class="form-control" min="1" value="1">
+          <label for="itemQty" class="form-label">Quantity</label>
+          <input
+            type="number"
+            id="itemQty"
+            class="form-control"
+            min="1"
+            value="1"
+          />
         </div>
         <div class="col-md-2 d-flex align-items-end">
-            <button id="addToCartBtn" class="btn btn-success w-100">Add to Cart</button>
+          <button id="addToCartBtn" class="btn btn-success w-100">
+            Add to Cart
+          </button>
         </div>
-    </div>
-    <div class="card mt-5">
+      </div>
+      <div class="card mt-5">
         <div class="card-header">Order Cart</div>
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Total</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody id="cartTableBody">
-                    <!-- Cart rows will go here -->
-                    </tbody>
-                </table>
-            </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Item Name</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="cartTableBody">
+                <!-- Cart rows will go here -->
+              </tbody>
+            </table>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="row mt-5">
-        <div class="col-md-12  d-flex align-items-center justify-content-between gap-3">
-            <h3  class="mb-0">Total RS : <span id="totalAmt"> 00.00</span></h3>
-            <div class="d-flex gap-2">
-                <button id="placeOrderBtn" class="btn btn-primary">Place Order</button>
-                <button id="printBillBtn" class="btn btn-secondary">Print Bill</button>
-            </div>
+      <div class="row mt-5">
+        <div
+          class="col-md-12 d-flex align-items-center justify-content-between gap-3"
+        >
+          <h3 class="mb-0">Total RS : <span id="totalAmt"> 00.00</span></h3>
+          <div class="d-flex gap-2">
+            <button id="placeOrderBtn" class="btn btn-primary">
+              Place Order
+            </button>
+            <button id="printBillBtn" class="btn btn-secondary">
+              Print Bill
+            </button>
+          </div>
         </div>
         <div class="col-md-6"></div>
+      </div>
     </div>
-</div>
- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/placeOrder.js"></script>
-</body>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/placeOrder.js"></script>
+  </body>
 </html>

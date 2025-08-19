@@ -1,5 +1,9 @@
 let customers = [];
 const BASE_URL = "http://localhost:8080/pahanaedu"
+const status = "ISSUED"
+const createdBy = 1;
+const taxRate = 0;
+let discountAmt = 0
 
 const getAllCustomers = async () => {
   try {
@@ -50,7 +54,7 @@ async function getAllItems() {
     allItems = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
     console.log("Items fetched successfully:", allItems);
 
-    console.log("Items", allItems);
+    console.log("All Items", allItems);
   } catch (err) {
     console.error('Failed to fetch items:', err);
   }
@@ -61,16 +65,22 @@ const loadItemDropdown = () => {
   itemNameSelect.innerHTML = allItems.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
 };
 
-document.getElementById('addToCartBtn').addEventListener('click', function() {
+document.getElementById('addToCartBtn').addEventListener('click', function () {
+  
   const itemId = document.getElementById('itemName').value;
   const qty = parseInt(document.getElementById('itemQty').value);
   const item = allItems.find(i => i.id == itemId);
+  console.log("Item Id", itemId)
+  console.log("QTY",qty)
+  console.log("Item",item)
+ 
   if (!item || qty < 1) {
     alert('Please select a valid item and quantity.');
     return;
   }
   // Check if item already in cart
   const cartItem = items.find(ci => ci.id == itemId);
+  console.log("Cart item table", cartItem);
   if (cartItem) {
     cartItem.qty += qty;
   } else {
@@ -85,6 +95,9 @@ document.getElementById('addToCartBtn').addEventListener('click', function() {
 });
 
 function renderCartTable() {
+  //console.log("Cart items", items);
+  const qty = parseInt(document.getElementById('itemQty').value);
+
   const tbody = document.getElementById('cartTableBody');
   tbody.innerHTML = items.map((ci, idx) => `
     <tr>
@@ -96,7 +109,6 @@ function renderCartTable() {
     </tr>
   `).join('');
 
-  console.log("Cart Items", items);
 }
 
 window.removeCartItem = function(idx) {
@@ -104,6 +116,13 @@ window.removeCartItem = function(idx) {
   renderCartTable();
 }
 
+
+
 getAllItems().then(loadItemDropdown);
 
+function getDiscountAmount() {
+  const discountInput = document.getElementById('discountAmt');
+  discountAmt = discountInput.value || 0;
 
+  console.log("Discount Amount", discountAmt);
+}

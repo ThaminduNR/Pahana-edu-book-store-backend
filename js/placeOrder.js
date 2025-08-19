@@ -1,3 +1,8 @@
+
+async function getLastInvoiceId() {
+
+}
+
 let customers = [];
 const BASE_URL = "http://localhost:8080/pahanaedu"
 const status = "ISSUED"
@@ -193,3 +198,10 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
     alert('Error placing order: ' + err.message);
   }
 });
+
+document.getElementById('printBillBtn').addEventListener('click', function () {
+  //getLastInvoiceID()
+  window.open('invoice.html', '_blank');
+});
+
+

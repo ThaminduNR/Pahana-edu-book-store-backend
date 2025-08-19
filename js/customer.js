@@ -62,6 +62,7 @@ const postCustomer = async (customer) => {
         });
         if (!res.ok) throw new Error('Failed to add customer');
         const data = await res.json();
+        swal("Customer create Succesfully")
         // refresh the customer list
         await getAllCustomers();
         //  clear the form after successful add
@@ -69,7 +70,7 @@ const postCustomer = async (customer) => {
         document.getElementById('updateBtn').disabled = true;
         return data;
     } catch (err) {
-        alert('Error adding customer: ' + err.message);
+        swal('Error adding customer: ' + err.message);
         console.error(err);
     }
 }
@@ -90,7 +91,7 @@ document.getElementById('customerForm').addEventListener('submit', async functio
 const updateCustomer = async () => {
     const id = document.getElementById('customerId').value.trim();
     if (!id) {
-        alert('No customer selected for update.');
+        swal('No customer selected for update.');
         return;
     }
     const customer = {
@@ -110,11 +111,12 @@ const updateCustomer = async () => {
             body: JSON.stringify(customer)
         });
         if (!res.ok) throw new Error('Failed to update customer');
+        swal("Customer update Succesfully")
         await getAllCustomers();
         document.getElementById('customerForm').reset();
         document.getElementById('updateBtn').disabled = true;
     } catch (err) {
-        alert('Error updating customer: ' + err.message);
+        swal('Error updating customer: ' + err.message);
         console.error(err);
     }
 }
@@ -126,27 +128,39 @@ document.getElementById('updateBtn').addEventListener('click', async function ()
 // Delete customer by id
 const deleteCustomer = async (id) => {
     if (!id) {
-        alert('No customer selected for delete.');
+        swal('No customer selected for delete.');
         return;
     }
     // Find customer for confirmation
     const customer = customers.find(c => c.id == id);
     if (!customer) {
-        alert('Customer not found.');
+        swal('Customer not found.');
         return;
     }
-    if (!confirm(`Are you sure you want to delete customer ${customer.name}?`)) return;
+        // Use SweetAlert for confirmation
+        const willDelete = await new Promise(resolve => {
+            swal({
+                title: `Are you sure?`,
+                text: `Do you want to delete customer ${customer.name}?`,
+                icon: "warning",
+                buttons: ["Cancel", "Delete"],
+                dangerMode: true,
+            }).then(willDelete => resolve(willDelete));
+        });
+    if (!willDelete) return;
+    console.log("selected delete customer ID", id);
     try {
         const res = await fetch(`${BASE_URL}/customers?id=${id}`, {
             method: 'DELETE',
         });
         if (!res.ok) throw new Error('Failed to delete customer');
+        swal("Customer Delete Succesfully")
         await getAllCustomers();
         document.getElementById('customerForm').reset();
         document.getElementById('updateBtn').disabled = true;
         document.getElementById('deleteBtn').disabled = true;
     } catch (err) {
-        alert('Error deleting customer: ' + err.message);
+        swal('Error deleting customer: ' + err.message);
         console.error(err);
     }
 }

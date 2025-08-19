@@ -1,3 +1,4 @@
+
 const BASE_URL = "http://localhost:8080/pahanaedu"
 
 let items = [];
@@ -140,3 +141,10 @@ document.getElementById('deleteBtn').addEventListener('click', function() {
 });
 
 getAllItems();
+
+document.getElementById('clearBtn').addEventListener('click', function() {
+    document.getElementById('itemForm').reset();
+    document.getElementById('itemId').value = '';
+    document.getElementById('updateBtn').disabled = true;
+    document.getElementById('deleteBtn').disabled = true;
+});

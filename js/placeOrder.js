@@ -99,7 +99,7 @@ document.getElementById('addToCartBtn').addEventListener('click', function () {
   console.log("Item",item)
  
   if (!item || qty < 1) {
-    alert('Please select a valid item and quantity.');
+    swal('Please select a valid item and quantity.');
     return;
   }
   // Check if item already in cart
@@ -156,7 +156,7 @@ function getDiscountAmount() {
 // Place Order button 
 document.getElementById('placeOrderBtn').addEventListener('click', async function () {
   if (items.length === 0) {
-    alert('Please add at least one item to the cart before placing the order.');
+    swal('Please add at least one item to the cart before placing the order.');
     return;
   }
   const customerId = parseInt(document.getElementById('customerId').value);
@@ -189,13 +189,13 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
     });
     if (!res.ok) throw new Error('Failed to place order');
     const data = await res.json();
-    alert('Order placed successfully!');
+    swal('Order placed successfully!');
     items = [];
     renderCartTable();
     document.getElementById('discountAmt').value = '';
     document.getElementById('itemQty').value = 0;
   } catch (err) {
-    alert('Error placing order: ' + err.message);
+    swal('Error placing order: ' + err.message);
   }
 });
 

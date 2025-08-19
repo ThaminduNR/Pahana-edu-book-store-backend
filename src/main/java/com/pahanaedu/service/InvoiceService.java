@@ -5,4 +5,5 @@ import com.pahanaedu.dto.InvoiceDto;
 public interface InvoiceService extends CrudService<InvoiceDto,Integer>{
 
     boolean updateStatus(int id, String status) throws Exception;
+    int getLastInvoiceId() throws Exception;
 }

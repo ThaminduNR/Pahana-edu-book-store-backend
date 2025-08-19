@@ -2,6 +2,7 @@ package com.pahanaedu.dao.impl;
 
 import com.pahanaedu.dao.InvoiceDAO;
 import com.pahanaedu.exception.NotFoundException;
+import com.pahanaedu.model.Bill;
 import com.pahanaedu.model.Invoice;
 import com.pahanaedu.model.InvoiceItem;
 import com.pahanaedu.util.DBUtil;
@@ -126,6 +127,49 @@ public class InvoiceDaoImpl implements InvoiceDAO {
         }
     }
 
+    @Override
+    public int getLastInvoiceId() throws Exception {
+        String sql = "SELECT id FROM invoices ORDER BY id DESC LIMIT 1";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public Bill getInvoiceDetails(int invoiceId) throws Exception {
+
+        String sql = "SELECT i.id AS invoice_id, i.invoice_no, i.invoice_date, i.customer_id, i.subtotal, i.tax_amount, i.discount_amt, i.total_amount, i.status, JSON_ARRAYAGG(JSON_OBJECT('itemName', it.name, 'quantity', ii.quantity, 'unitPrice', ii.unit_price, 'lineTotal', ii.quantity * ii.unit_price)) AS items FROM invoices i JOIN invoice_items ii ON ii.invoice_id = i.id JOIN items it ON it.id = ii.item_id WHERE i.id = ? GROUP BY i.id, i.invoice_no, i.invoice_date, i.customer_id, i.subtotal, i.tax_amount, i.discount_amt, i.total_amount, i.status";
+        try (Connection con = com.pahanaedu.util.DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, invoiceId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Bill bill = new Bill();
+                    bill.setInvoiceId(rs.getInt("invoice_id"));
+                    bill.setInvoiceNumber(rs.getString("invoice_no"));
+                    bill.setInvoiceDate(rs.getTimestamp("invoice_date").toLocalDateTime().toString());
+                    bill.setCustomerID(String.valueOf(rs.getInt("customer_id")));
+                    bill.setSubTotal(rs.getBigDecimal("subtotal"));
+                    bill.setTax(rs.getBigDecimal("tax_amount"));
+                    bill.setDiscount(rs.getBigDecimal("discount_amt"));
+                    bill.setTotal(rs.getBigDecimal("total_amount"));
+                    bill.setStatus(rs.getString("status"));
+                    String itemsJson = rs.getString("items");
+                    bill.setItems(com.pahanaedu.util.JsonUtil.parseBillItems(itemsJson));
+
+                    System.out.println("Retrieved Bill: " + bill);
+                    return bill;
+                }
+            }
+        }
+        return null;
+    }
+
     private Invoice map(ResultSet rs) throws SQLException {
         Invoice inv = new Invoice();
         inv.setId(rs.getInt("id"));
@@ -144,18 +188,29 @@ public class InvoiceDaoImpl implements InvoiceDAO {
     }
 
 
-    //updated code
-    //Generate a simple invoice number like "INV-2025-0012"
     public String generateNextInvoiceNo(LocalDate date) throws Exception {
-        String pattern = "INV-%d-%04d";
-        String sql = "SELECT IFNULL(MAX(id),0)+1 AS n FROM invoices";
+        String year = String.valueOf(date.getYear());
+        String pattern = "INV-%s-%04d";
+        String sql = "SELECT invoice_no FROM invoices WHERE invoice_no LIKE ? ORDER BY invoice_no DESC LIMIT 1";
+        int nextNum = 1;
         try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            rs.next();
-            int next = rs.getInt("n");
-            return String.format(pattern, date.getYear(), next);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "INV-" + year + "-%");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String lastNo = rs.getString("invoice_no");
+                    String[] parts = lastNo.split("-");
+                    if (parts.length == 3) {
+                        try {
+                            nextNum = Integer.parseInt(parts[2]) + 1;
+                        } catch (NumberFormatException ignore) {}
+                    }
+                }
+            }
         }
+        String newInvoiceNo = String.format(pattern, year, nextNum);
+        System.out.println("Next invoice number: " + newInvoiceNo);
+        return newInvoiceNo;
     }
 
 
@@ -181,7 +236,7 @@ public class InvoiceDaoImpl implements InvoiceDAO {
                         throw new SQLException("Insufficient stock for item " + li.getItemId());
                 }
 
-                // 2) Recompute money (server-side)
+                // 2) Recompute money
                 MoneyTotals totals = computeTotals(lines, inv.getDiscountAmt(), taxRate);
                 inv.setSubtotal(totals.subtotal);
                 inv.setTaxAmount(totals.tax);

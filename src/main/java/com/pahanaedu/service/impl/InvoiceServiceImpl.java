@@ -70,8 +70,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public int create(InvoiceDto dto) throws Exception {
-        //validateForCreate(inv);
-
         // Sensible defaults
         if (dto.getInvoiceDate() == null) dto.setInvoiceDate(dc.toStringLdt(LocalDateTime.now()));
         if (dto.getSubtotal() == null) dto.setSubtotal(BigDecimal.ZERO);
@@ -84,8 +82,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         if (dto.getStatus() == null || dto.getStatus().isEmpty()) dto.setStatus("DRAFT");
 
+
+
+        //dto.setInvoiceNo(generateNextInvoiceNo(LocalDate.now()));
+
+        System.out.println("Creating invoice with number: " + dto.getInvoiceNo());
+
         Invoice invoice = new Invoice();
-        invoice.setInvoiceNo(dto.getInvoiceNo());
+        invoice.setInvoiceNo(generateNextInvoiceNo(LocalDate.now()));
         invoice.setCustomerId(dto.getCustomerId());
         invoice.setInvoiceDate(dc.toLdt(dto.getInvoiceDate()));
         invoice.setSubtotal(dto.getSubtotal());
@@ -97,7 +101,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
         int id = invoiceDAO.create(invoice);
-        dto.setId(id); // handy for callers
+        dto.setId(id);
         return id;
     }
 
@@ -119,7 +123,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (dto.getStatus() != null) existing.setStatus(dto.getStatus());
         if (dto.getCreatedBy() != null) existing.setCreatedBy(dto.getCreatedBy());
 
-        // If total not provided, recompute from parts (when all parts available)
+
         if (existing.getTotalAmount() == null
                 && existing.getSubtotal() != null
                 && existing.getTaxAmount() != null
@@ -151,13 +155,25 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDAO.updateStatus(id, status);
     }
 
+    @Override
+    public int getLastInvoiceId() throws Exception {
+        int lastInvoiceId = invoiceDAO.getLastInvoiceId();
+        if (lastInvoiceId <= 0) {
+            throw new NotFoundException("No invoices found");
+        }
+        return lastInvoiceId;
+
+    }
+
 
     //generate Invoice ID
     public String generateNextInvoiceNo(LocalDate date) throws Exception {
+        System.out.println("Generating next invoice number for date: " + date);
         if (!(invoiceDAO instanceof InvoiceDaoImpl)) {
             throw new IllegalStateException("InvoiceDAO does not support generateNextInvoiceNo");
         }
         InvoiceDaoImpl impl = (InvoiceDaoImpl) invoiceDAO;
+        System.out.println(impl.generateNextInvoiceNo(date != null ? date : LocalDate.now()));
         return impl.generateNextInvoiceNo(date != null ? date : LocalDate.now());
     }
 
@@ -171,7 +187,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new IllegalStateException("InvoiceDAO does not support createInvoiceWithItems");
         }
 
-        // Prepare header model
+
         Invoice inv = new Invoice();
         inv.setInvoiceNo(headerDto.getInvoiceNo());
         inv.setCustomerId(headerDto.getCustomerId());
@@ -182,7 +198,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         inv.setStatus(headerDto.getStatus() == null || headerDto.getStatus().isEmpty() ? "ISSUED" : headerDto.getStatus());
         inv.setCreatedBy(headerDto.getCreatedBy());
 
-        // Optionally pre-compute totals to reflect back to caller (DAO also recomputes defensively)
+
+        inv.setInvoiceNo(generateNextInvoiceNo(LocalDate.now()));
+
+
         Totals t = computeTotals(lines, inv.getDiscountAmt(), taxRate);
         inv.setSubtotal(t.subtotal);
         inv.setTaxAmount(t.tax);
@@ -190,7 +209,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         int newId = daoimpl.createInvoiceWithItems(inv, lines, taxRate == null ? BigDecimal.ZERO : taxRate);
 
-        // mirror values back to DTO for convenience (not required)
+
         headerDto.setId(newId);
         headerDto.setInvoiceNo(inv.getInvoiceNo());
         headerDto.setInvoiceDate(dc.toStringLdt(inv.getInvoiceDate()));
@@ -203,7 +222,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return newId;
     }
 
-    // ---------- helpers (internal) ----------
+
 
     private static class Totals {
         BigDecimal subtotal;
@@ -211,9 +230,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal total;
     }
 
-    /**
-     * Compute totals from line items, discount and tax rate (scale=2, HALF_UP)
-     */
+
     private Totals computeTotals(List<InvoiceItem> lines, BigDecimal discountAmt, BigDecimal taxRate) {
         Totals out = new Totals();
         BigDecimal subtotal = BigDecimal.ZERO;
@@ -234,6 +251,3 @@ public class InvoiceServiceImpl implements InvoiceService {
         return out;
     }
 }
-
-
-

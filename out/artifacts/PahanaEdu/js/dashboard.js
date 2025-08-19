@@ -9,8 +9,7 @@ const pages = {
 };
 const sidebarNav = document.getElementById('sidebarNav');
 const mainContent = document.getElementById('mainContent');
-const mainIframe = document.getElementById('mainIframe');
-const mainWelcome = document.getElementById('mainWelcome');
+
 sidebarNav.addEventListener('click', function(e) {
     if (e.target && e.target.matches('a[data-page]')) {
         e.preventDefault();
@@ -19,18 +18,6 @@ sidebarNav.addEventListener('click', function(e) {
         // Add active to clicked
         e.target.classList.add('active');
         const page = e.target.getAttribute('data-page');
-        if (page === 'page2') {
-            mainIframe.src = './customer.html';
-            mainIframe.style.display = 'block';
-            mainWelcome.style.display = 'none';
-        } else if (page === 'page3') {
-            mainIframe.src = './item.html';
-            mainIframe.style.display = 'block';
-            mainWelcome.style.display = 'none';
-        } else {
-            mainIframe.style.display = 'none';
-            mainWelcome.style.display = 'block';
-            mainWelcome.innerHTML = pages[page] || '<h2>Not Found</h2>';
-        }
+        mainContent.innerHTML = pages[page] || '<h2>Not Found</h2>';
     }
 });
